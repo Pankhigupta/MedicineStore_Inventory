@@ -3,9 +3,10 @@ import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import axios from "axios";
 
 const Scanner = () => {
-  const scannerId = useRef(`reader-${Math.random().toString(36).substring(2, 8)}`);
+  const SCANNER_ID = "reader"; // ✅ fixed ID
   const html5QrCodeRef = useRef(null);
   const scannerStarted = useRef(false);
+
   const [groupCode, setGroupCode] = useState("");
   const [medicines, setMedicines] = useState([]);
   const [selectedMedicine, setSelectedMedicine] = useState(null);
@@ -24,10 +25,14 @@ const Scanner = () => {
 
   useEffect(() => {
     const initScanner = async () => {
-      try {
-        const html5QrCode = new Html5Qrcode(scannerId.current);
-        html5QrCodeRef.current = html5QrCode;
+      const scannerElement = document.getElementById(SCANNER_ID);
 
+      if (!scannerElement || html5QrCodeRef.current) return; // prevent double init
+
+      const html5QrCode = new Html5Qrcode(SCANNER_ID);
+      html5QrCodeRef.current = html5QrCode;
+
+      try {
         await html5QrCode.start(
           { facingMode: "environment" },
           {
@@ -56,7 +61,7 @@ const Scanner = () => {
               fetchMedicines(decodedText);
             }
           },
-          () => {} // silent errors
+          () => {} // ignore scan errors
         );
 
         scannerStarted.current = true;
@@ -73,7 +78,7 @@ const Scanner = () => {
         html5QrCodeRef.current
           .stop()
           .then(() => html5QrCodeRef.current.clear())
-          .catch((err) => console.warn("Cleanup stop error:", err));
+          .catch((err) => console.warn("Cleanup error:", err));
       }
     };
   }, []);
@@ -95,7 +100,7 @@ const Scanner = () => {
   return (
     <div>
       <h2>Scan Barcode</h2>
-      <div id={scannerId.current} style={{ width: "300px", marginBottom: "20px" }}></div>
+      <div id={SCANNER_ID} style={{ width: "300px", marginBottom: "20px" }}></div>
 
       {groupCode && (
         <div>
@@ -110,7 +115,11 @@ const Scanner = () => {
           </select>
           <br />
           <label>Quantity:</label>
-          <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+          />
           <br />
           <button onClick={updateStock}>Update Stock</button>
           <p>{status}</p>

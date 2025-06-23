@@ -49,11 +49,30 @@ const GroupForm = () => {
       <button onClick={generateGroupCode}>Generate Group Code</button>
 
       {groupCode && (
-        <div>
-          <p><strong>Group Code:</strong> {groupCode}</p>
+      <div>
+        <p><strong>Group Code:</strong> {groupCode}</p>
+        <Barcode value={groupCode} />
+
+        {/* 🖨️ Hidden print section */}
+        <div id="print-barcode" style={{ display: 'none' }}>
+          <h3>Medicine Group Barcode</h3>
           <Barcode value={groupCode} />
         </div>
-      )}
+
+        {/* 🖨️ Print Button */}
+        <button onClick={() => {
+          const section = document.getElementById('print-barcode');
+          section.style.display = 'block';
+          setTimeout(() => {
+            window.print();
+            section.style.display = 'none';
+          }, 300);
+        }}>
+          🖨️ Print Barcode
+        </button>
+      </div>
+    )}
+
 
       <h3>Medicines in this Group</h3>
       {medicines.map((med, idx) => (

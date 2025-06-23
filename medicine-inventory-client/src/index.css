@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #print-barcode, #print-barcode * {
+    visibility: visible;
+  }
+
+  #print-barcode {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+  }
+}
